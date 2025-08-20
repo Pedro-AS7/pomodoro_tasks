@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import type { Task } from './TasksContainer'
-import { v4 as uuidv4 } from "uuid";
-
+import { v4 as uuidv4 } from 'uuid'
 
 interface TaskInputProps {
 	addTask: (task: Task) => void
@@ -19,20 +18,23 @@ export default function TaskInput({ addTask }: TaskInputProps) {
 				}}
 				onKeyDown={(e) => {
 					if (e.key === 'Enter') {
-						addTask({ id: uuidv4(), content: task })
+						if (!task.trim()) return // Prevent adding empty tasks
+						addTask({ id: uuidv4(), content: task, isCompleted: false })
 						setTask('')
 					}
 				}}
 				type="text"
 				placeholder="Add a new task"
-				className="w-full p-2 bg-white border border-gray-300 rounded-xl "
+				className="w-full p-4 text-lg bg-[#ffffff48] placeholder-gray-50 
+                     text-gray-50 rounded-xl "
 			/>
 			<button
 				onClick={() => {
-					addTask({ id: uuidv4(), content: task })
+					if (!task.trim()) return // Prevent adding empty tasks
+					addTask({ id: uuidv4(), content: task, isCompleted: false })
 					setTask('')
 				}}
-				className="px-4 py-1 bg-white text-black font-semibold rounded-xl hover:bg-gray-100 active:scale-97"
+				className="px-4 bg-white text-lg text-black font-bold rounded-xl hover:bg-gray-100 active:scale-97"
 			>
 				Add
 			</button>
