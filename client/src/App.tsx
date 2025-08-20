@@ -13,7 +13,7 @@ function App() {
             </button>
             </nav>
 
-            <section className='w-full h-[80%] flex flex-row justify-center items-center gap-10'>
+            <section className='w-full h-[80%] flex flex-col lg:flex-row justify-center items-center gap-10'>
                 <Timer />
                 <TasksContainer />
             </section>

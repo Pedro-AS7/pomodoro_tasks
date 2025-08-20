@@ -211,7 +211,7 @@ export default function Timer() {
 				/>
 			) : (
 				<div className="flex flex-col w-[50%] h-full bg justify-between items-center gap-x-2 gap-y-10">
-					<div className="col-span-4 flex flex-col items-center gap-5">
+					<div className="h-[70%] w-full flex flex-col items-center gap-3">
 						<div
 							className={`w-fit flex flex-col text-center justify-center items-center gap-1 text-3xl font-bold ${
 								timeState === 1
