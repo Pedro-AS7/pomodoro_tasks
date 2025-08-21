@@ -18,7 +18,7 @@ export default function TaskInput({ addTask }: TaskInputProps) {
 				}}
 				onKeyDown={(e) => {
 					if (e.key === 'Enter') {
-						if (!task.trim()) return // Prevent adding empty tasks
+						if (!task.trim()) return 
 						addTask({ id: uuidv4(), content: task, isCompleted: false })
 						setTask('')
 					}
@@ -30,8 +30,8 @@ export default function TaskInput({ addTask }: TaskInputProps) {
                      text-black rounded-2xl ring-0 ring-transparent focus:ring-[#8b8b8b00]"
 			/>
 			<button
-				onClick={(e) => {
-					if (!task.trim()) return // Prevent adding empty tasks
+				onClick={() => {
+					if (!task.trim()) return 
 					addTask({ id: uuidv4(), content: task, isCompleted: false })
 					setTask('')
 				}}

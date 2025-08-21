@@ -1,19 +1,38 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import Clock from './Clock'
 import ProgressBar from './ProgressBar'
 import StartStopButton from './StartStopButton'
-import { Cog, RotateCcw, SkipForward } from 'lucide-react'
 import TimerConfig from './TimerConfig'
+import { Cog, RotateCcw, SkipForward } from 'lucide-react'
+
+const TIMER_STATES = {
+	FOCUS: 1,
+	SHORT_BREAK: 2,
+	LONG_BREAK: 3,
+	FINISHED: 4,
+} as const
+
+type TimerState = (typeof TIMER_STATES)[keyof typeof TIMER_STATES]
+type PomodoroSequence = (typeof TIMER_STATES.FOCUS | typeof TIMER_STATES.SHORT_BREAK | typeof TIMER_STATES.LONG_BREAK)[]
+
+// Função para criar a sequência de Pomodoros
+const generatePomodoroSequence = (cycles: number, sessions: number): PomodoroSequence => {
+	const sequence: PomodoroSequence = []
+	for (let i = 0; i < sessions; i++) {
+		for (let j = 0; j < cycles; j++) {
+			sequence.push(TIMER_STATES.FOCUS)
+			if (j < cycles - 1) {
+				sequence.push(TIMER_STATES.SHORT_BREAK)
+			}
+		}
+		if (i < sessions - 1) {
+			sequence.push(TIMER_STATES.LONG_BREAK)
+		}
+	}
+	return sequence
+}
 
 export default function Timer() {
-	const [time, setTime] = useState<number>(1500)
-	const [isRunning, setIsRunning] = useState(false)
-	const [pauseDuration, setPauseDuration] = useState<number>(0)
-	const [pomodoroConfig, setPomodoroConfig] = useState<(1 | 2 | 3)[]>()
-	const [longPauseDuration, setLongPauseDuration] = useState<number>(0)
-	const [timeState, setTimeState] = useState<1 | 2 | 3 | 4>(1)
-	const [cyclesNumber, setCyclesNumber] = useState(3)
-	const [sessions, setSessions] = useState(2)
 	const [timerConfig, setTimerConfig] = useState({
 		time: 1500,
 		pauseDuration: 300,
@@ -21,282 +40,224 @@ export default function Timer() {
 		pomodoroCycles: 3,
 		sessions: 2,
 	})
-	const [isConfig, setIsConfig] = useState(false)
 
-	const getTimerState = { 1: time, 2: pauseDuration, 3: longPauseDuration, 4: 0 }
+	const [time, setTime] = useState(timerConfig.time)
+	const [pauseDuration, setPauseDuration] = useState(timerConfig.pauseDuration)
+	const [longPauseDuration, setLongPauseDuration] = useState(timerConfig.longPauseDuration)
 
-	function setConfig() {
+	const [isRunning, setIsRunning] = useState(false)
+
+	const [isConfigOpen, setIsConfigOpen] = useState(false)
+
+	const [currentState, setCurrentState] = useState<TimerState>(TIMER_STATES.FOCUS)
+
+	const [pomodoroSequence, setPomodoroSequence] = useState<PomodoroSequence>([])
+
+	// Define o tempo restante para o estado em decorrência
+	const timeForCurrentState = useMemo(
+		() => ({
+			[TIMER_STATES.FOCUS]: time,
+			[TIMER_STATES.SHORT_BREAK]: pauseDuration,
+			[TIMER_STATES.LONG_BREAK]: longPauseDuration,
+			[TIMER_STATES.FINISHED]: 0,
+		}),
+		[time, pauseDuration, longPauseDuration]
+	)
+
+	// Define a duração de cada estado quando o timer é iniciado ou configurado
+	const totalDurationForState = useMemo(
+		() => ({
+			[TIMER_STATES.FOCUS]: timerConfig.time,
+			[TIMER_STATES.SHORT_BREAK]: timerConfig.pauseDuration,
+			[TIMER_STATES.LONG_BREAK]: timerConfig.longPauseDuration,
+		}),
+		[timerConfig]
+	)
+
+	// Define informações sobre cada estado para o texto acima do timer
+	const stateInfo = useMemo(
+		() => ({
+			[TIMER_STATES.FOCUS]: { text: 'Focus', color: 'text-orange-500' },
+			[TIMER_STATES.SHORT_BREAK]: { text: 'Short Break', color: 'text-green-500' },
+			[TIMER_STATES.LONG_BREAK]: { text: 'Long Break', color: 'text-blue-500' },
+			[TIMER_STATES.FINISHED]: { text: 'Finished', color: 'text-white' },
+		}),
+		[]
+	)
+
+	// Reseta o timer
+	const resetTimer = useCallback(() => {
+		console.log('Resetting timer')
+		setIsRunning(false)
 		setTime(timerConfig.time)
 		setPauseDuration(timerConfig.pauseDuration)
 		setLongPauseDuration(timerConfig.longPauseDuration)
-		setSessions(timerConfig.sessions)
-		const config: (1 | 2 | 3)[] = []
-		for (let i = 0; i < sessions; i++) {
-			for (let j = 0; j < cyclesNumber; j++) {
-				config.push(1)
-				if (j !== cyclesNumber - 1) {
-					config.push(2)
-				}
-			}
-			if (i !== sessions - 1) {
-				config.push(3)
-			}
-		}
-		setPomodoroConfig(config.slice(1))
-		console.log(config)
-		setTimeState(config[0])
-		if (isRunning) setIsRunning(false)
-		console.log('config: ' + config)
-	}
 
-	useEffect(() => {
-		console.log('time: ' + timerConfig.time)
-		setTime(timerConfig.time)
-		setPauseDuration(timerConfig.pauseDuration)
-		setLongPauseDuration(timerConfig.longPauseDuration)
-		setSessions(timerConfig.sessions)
-		const config: (1 | 2 | 3)[] = []
-		for (let i = 0; i < sessions; i++) {
-			for (let j = 0; j < cyclesNumber; j++) {
-				config.push(1)
-				if (j !== cyclesNumber - 1) {
-					config.push(2)
-				}
-			}
-			if (i !== sessions - 1) {
-				config.push(3)
-			}
-		}
-		setPomodoroConfig(config.slice(1))
-		console.log(config)
-		setTimeState(config[0])
-		console.log('config: ' + config)
-	}, [])
-
-	useEffect(() => {
-		setTime(timerConfig.time)
-		setPauseDuration(timerConfig.pauseDuration)
-		setLongPauseDuration(timerConfig.longPauseDuration)
-		setCyclesNumber((prev) => {
-			if (timerConfig.pomodoroCycles !== prev) {
-				const config: (1 | 2 | 3)[] = []
-				for (let i = 0; i < sessions; i++) {
-					for (let j = 0; j < timerConfig.pomodoroCycles; j++) {
-						config.push(1)
-						if (j !== timerConfig.pomodoroCycles - 1) {
-							config.push(2)
-						}
-					}
-					if (i !== sessions - 1) {
-						config.push(3)
-					}
-				}
-				setPomodoroConfig(config.slice(1))
-				console.log(config)
-				setTimeState(config[0])
-				return timerConfig.pomodoroCycles
-			}
-			return prev
-		})
-		setSessions((prev) => {
-			if (timerConfig.sessions !== prev) {
-				const config: (1 | 2 | 3)[] = []
-				for (let i = 0; i < timerConfig.sessions; i++) {
-					for (let j = 0; j < timerConfig.pomodoroCycles; j++) {
-						config.push(1)
-						if (j !== timerConfig.pomodoroCycles - 1) {
-							config.push(2)
-						}
-					}
-					if (i !== timerConfig.sessions - 1) {
-						config.push(3)
-					}
-				}
-				setPomodoroConfig(config.slice(1))
-				console.log(config)
-				setTimeState(config[0])
-				return timerConfig.sessions
-			}
-			return prev
-		})
-		return () => {}
+		const newSequence = generatePomodoroSequence(timerConfig.pomodoroCycles, timerConfig.sessions)
+		setCurrentState(newSequence[0] || TIMER_STATES.FINISHED)
+		setPomodoroSequence(newSequence.slice(1))
 	}, [timerConfig])
 
-	function getConfigState(): 1 | 2 | 3 | 4 {
-		console.log(`config? ` + pomodoroConfig)
-		setPomodoroConfig((prev) => prev?.slice(1))
-		return pomodoroConfig?.[0] ?? 1
-	}
+	// Reseta o estado (duração do timer) atual
+	const resetState = useCallback(() => {
+		switch (currentState) {
+			case 1:
+				setTime(timerConfig.time)
+				break
+			case 2:
+				setPauseDuration(timerConfig.pauseDuration)
+				break
+			case 3:
+				setLongPauseDuration(timerConfig.longPauseDuration)
+				break
+		}
+		setIsRunning(false)
+	}, [currentState, timerConfig])
 
-	function changeState() {
-		if (pomodoroConfig?.length === 0 && timeState !== 4) {
-			console.log('No more states to change to, resetting timer.')
-			setTimeState(4)
+	// Muda para o próximo estado da sequência
+	const advanceToNextState = useCallback(() => {
+		if (pomodoroSequence.length === 0) {
+			setCurrentState(TIMER_STATES.FINISHED)
 			setIsRunning(false)
-			setTime(0)
-			console.log('state: ' + timeState)
-		} else if (timeState !== 4) {
-			switch (timeState) {
-				case 1:
-					setTime(timerConfig.time)
-					break
-				case 2:
-					setPauseDuration(timerConfig.pauseDuration)
-					break
-				case 3:
-					setLongPauseDuration(timerConfig.longPauseDuration)
-					break
-			}
-			setTimeState(getConfigState())
+			return
 		}
-	}
 
-	function running() {
-		if (timeState === 1) {
-			setTime((p) => {
-				console.log(`Time: ${p}`)
-				if (p <= 0) {
-					changeState()
+		const nextState = pomodoroSequence[0]
+		setCurrentState(nextState)
+		setPomodoroSequence((prev) => prev.slice(1))
+
+		if (currentState === TIMER_STATES.FOCUS) setTime(timerConfig.time)
+		if (currentState === TIMER_STATES.SHORT_BREAK) setPauseDuration(timerConfig.pauseDuration)
+		if (currentState === TIMER_STATES.LONG_BREAK) setLongPauseDuration(timerConfig.longPauseDuration)
+	}, [pomodoroSequence, currentState, timerConfig])
+
+	// Lida com o tick do timer
+	const handleTick = useCallback(() => {
+		const decrementAndCheck = (setter: React.Dispatch<React.SetStateAction<number>>) => {
+			setter((prev) => {
+				if (prev <= 1) {
+					advanceToNextState()
+					return 0
 				}
-				return p - 1
+				return prev - 1
 			})
 		}
-		if (timeState === 2) {
-			setPauseDuration((p) => {
-				console.log(`Pause: ${p}`)
-				if (p <= 0) {
-					changeState()
-				}
-				return p - 1
-			})
+
+		switch (currentState) {
+			case TIMER_STATES.FOCUS:
+				decrementAndCheck(setTime)
+				break
+			case TIMER_STATES.SHORT_BREAK:
+				decrementAndCheck(setPauseDuration)
+				break
+			case TIMER_STATES.LONG_BREAK:
+				decrementAndCheck(setLongPauseDuration)
+				break
 		}
-		if (timeState === 3) {
-			setLongPauseDuration((p) => {
-				console.log(`Long Pause: ${p}`)
-				if (p <= 0) {
-					changeState()
-				}
-				return p - 1
-			})
+	}, [currentState, advanceToNextState])
+
+    // Configura o timer ao montar o componente
+	useEffect(() => {
+		resetTimer()
+	}, [resetTimer])
+
+    // Calcula o progresso do timer para a progress bar
+	const progress = useMemo(() => {
+		if (currentState === TIMER_STATES.FINISHED || !totalDurationForState[currentState]) {
+			return 100
 		}
-	}
+		const total = totalDurationForState[currentState]
+		const current = timeForCurrentState[currentState]
+		return 100 - (current / total) * 100
+	}, [currentState, timeForCurrentState, totalDurationForState])
 
 	return (
-		<div className="flex flex-col w-full max-w-md h-auto bg-gray-50 rounded-xl shadow-md p-6 gap-6">
-			{/* Esta div centraliza o conteúdo do timer. O gap pode ser ajustado para telas menores. */}
-			<div className="w-full flex flex-col justify-center items-center gap-y-3 sm:gap-y-5">
-				{/* - Tipografia Responsiva: `text-2xl` em telas pequenas e `md:text-3xl` em telas médias ou maiores.
-      - A lógica de cores foi mantida, pois é excelente!
-    */}
-				<div
-					className={`w-fit flex flex-col text-center justify-center items-center font-bold text-2xl md:text-3xl ${
-						(timeState === 1 && time < timerConfig.time) || (timeState === 1 && isRunning)
-							? 'text-orange-500'
-							: timeState === 2
-							? 'text-green-500'
-							: timeState === 3
-							? 'text-blue-500'
-							: 'text-gray-800' // Cor padrão mais legível que 'text-white' em fundo claro
-					}`}
-				>
-					{/* Lógica de texto mantida */}
-					{timeState === 1
-						? 'Focus'
-						: timeState === 2
-						? 'Short Break'
-						: timeState === 3
-						? 'Long Break'
-						: timeState === 4
-						? 'Finished'
-						: 'Get Ready'}
-				</div>
-
-				{/* Componentes Clock e ProgressBar mantidos, pois a lógica interna é que define seu visual */}
-				<Clock
-					timer={
-						timeState === 1
-							? time
-							: timeState === 2
-							? pauseDuration
-							: timeState === 3
-							? longPauseDuration
-							: 0
-					}
-					setTimer={running}
-					isRunning={isRunning}
-				/>
-				<ProgressBar
-					progress={
-						100 -
-						(getTimerState[timeState] /
-							(timeState === 1
-								? timerConfig.time
-								: timeState === 2
-								? timerConfig.pauseDuration
-								: timerConfig.longPauseDuration)) *
-							100
-					}
-				/>
-			</div>
-
-			{/* Container dos botões e controles */}
-			<div className="w-full items-center h-fit flex flex-col gap-4">
-				<StartStopButton
-					startStop={() =>
-						setIsRunning((prev) => {
-							if (pomodoroConfig?.length === 0) {
-								setConfig()
+		<div className="w-full h-full lg:w-[100%] max-w-xl rounded-xl  p-6 sm:p-8">
+			{isConfigOpen ? (
+				<TimerConfig
+					lastValues={{
+						pomodoroDuration: timerConfig.time / 60,
+						shortBreakDuration: timerConfig.pauseDuration / 60,
+						longBreakDuration: timerConfig.longPauseDuration / 60,
+						pomodoroCycles: timerConfig.pomodoroCycles,
+						sessions: timerConfig.sessions,
+					}}
+					setConfig={(pomodoroDuration, shortBreakDuration, longBreakDuration, cyclesNumber, sessions) => {
+						setTimerConfig(() => {
+							console.log(
+								`Setting new config: ${pomodoroDuration}, ${shortBreakDuration}, ${longBreakDuration}, ${cyclesNumber}, ${sessions}`
+							)
+							return {
+								time: pomodoroDuration,
+								pauseDuration: shortBreakDuration,
+								longPauseDuration: longBreakDuration,
+								pomodoroCycles: cyclesNumber,
+								sessions: sessions,
 							}
-							return !prev
 						})
-					}
-					value={isRunning ? 'STOP' : 'START'}
+					}}
+					closeConfig={() => setIsConfigOpen(false)}
 				/>
+			) : null}
+			<div className="flex flex-col w-full h-full justify-center items-center gap-8">
+				<div className="w-full flex flex-col justify-center items-center gap-y-4">
+					<div
+						className={`w-fit text-center font-bold text-2xl sm:text-3xl ${
+							stateInfo[currentState]?.color || 'text-gray-800'
+						}`}
+					>
+						{stateInfo[currentState]?.text}
+					</div>
 
-				{/* - Gap responsivo para os ícones: `gap-6` em telas pequenas e `sm:gap-8` em maiores. */}
-				<div className="flex gap-6 sm:gap-8 justify-center items-center">
-					<Cog
-						className="cursor-pointer hover:scale-110 transition-all duration-200"
-						color="black"
-						size={24}
-						strokeWidth={3}
-						onClick={() => setIsConfig(true)}
-					/>
-					<RotateCcw
-						className="cursor-pointer hover:scale-110 transition-all duration-200"
-						color="black"
-						strokeWidth={3}
-						size={24}
-						onClick={() => {
-							switch (timeState) {
-								case 1:
-									setTime(timerConfig.time)
-									break
-								case 2:
-									setPauseDuration(timerConfig.pauseDuration)
-									break
-								case 3:
-									setLongPauseDuration(timerConfig.longPauseDuration)
-									break
-							}
-							setIsRunning(false)
-						}}
-					/>
-					<SkipForward
-						className="cursor-pointer hover:scale-110 transition-all duration-200"
-						color="black"
-						size={24}
-						strokeWidth={3}
-						onClick={changeState}
-					/>
+					<Clock timer={timeForCurrentState[currentState]} setTimer={handleTick} isRunning={isRunning} />
+
+					<ProgressBar progress={progress} />
 				</div>
 
-				{/* - Botão "Reset all" com largura baseada no conteúdo (`w-auto`) e padding (`px-5 py-1`).
-      - Isso é muito mais estável do que `w-[30%]`.
-    */}
+				<div className="w-full items-center flex flex-col gap-4">
+					<StartStopButton
+						startStop={() => {
+							if (currentState === TIMER_STATES.FINISHED) {
+								resetTimer()
+								setIsRunning(true)
+							} else {
+								setIsRunning((prev) => !prev)
+							}
+						}}
+						value={isRunning ? 'STOP' : 'START'}
+					/>
+
+					<div className="flex gap-6 sm:gap-8 justify-center items-center">
+						<Cog
+							className="cursor-pointer lg:hover:scale-110 transition-all duration-200"
+							color="gray"
+							size={24}
+							strokeWidth={3}
+							onClick={() => {
+								setIsConfigOpen(true)
+								setIsRunning(false)
+							}}
+						/>
+						<RotateCcw
+							className="cursor-pointer hover:scale-110 transition-all duration-200"
+							color="gray"
+							strokeWidth={3}
+							size={24}
+							onClick={resetState}
+						/>
+						<SkipForward
+							className="cursor-pointer hover:scale-110 transition-all duration-200"
+							color="gray"
+							size={24}
+							strokeWidth={3}
+							onClick={advanceToNextState}
+						/>
+					</div>
+				</div>
+
 				<button
-					onClick={setConfig}
-					className="w-auto px-5 py-1 flex gap-3 justify-center items-center bg-gray-200 cursor-pointer rounded-lg mt-2 shadow-sm text-gray-600 text-center font-medium hover:bg-gray-300 transition-all duration-200 active:scale-95"
+					onClick={resetTimer}
+					className="w-auto px-5 py-1 flex justify-center items-center bg-gray-100 cursor-pointer rounded-lg shadow-sm text-gray-600 text-center font-medium hover:bg-gray-200 transition-all duration-200 active:scale-95"
 				>
 					Reset all
 				</button>

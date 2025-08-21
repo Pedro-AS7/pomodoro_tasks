@@ -3,7 +3,7 @@ import type { Task } from './TasksContainer'
 import {
 	DndContext,
 	closestCenter,
-	PointerSensor, // Sensor para mouse
+	PointerSensor, 
 	TouchSensor,
 	useSensor,
 	useSensors,
@@ -20,16 +20,15 @@ interface TasksListProps {
 }
 
 export default function TasksList({ tasks, setTasks, deleteTask, updateTask }: TasksListProps) {
+    // Lógica para drag and drop das tasks ->
 	const [activeTask, setActiveTask] = useState<Task | null>(null)
 	const sensors = useSensors(
 		useSensor(PointerSensor, {
-			// Requer que o mouse se mova 8px para ativar
 			activationConstraint: {
 				distance: 8,
 			},
 		}),
 		useSensor(TouchSensor, {
-			// Requer um toque de 250ms e tolerância de 5px de movimento
 			activationConstraint: {
 				delay: 250,
 				tolerance: 5,
@@ -38,12 +37,10 @@ export default function TasksList({ tasks, setTasks, deleteTask, updateTask }: T
 	)
 	function handleDragStart(event: DragStartEvent) {
 		const { active } = event
-		// Encontra a tarefa correspondente ao ID e a define como ativa
 		const task = tasks.find((t) => t.id === active.id)
 		setActiveTask(task || null)
 	}
 	function handleDragEnd(event: DragEndEvent) {
-		// Limpa a tarefa ativa ao final do arraste
 		setActiveTask(null)
 
 		const { active, over } = event
@@ -55,6 +52,7 @@ export default function TasksList({ tasks, setTasks, deleteTask, updateTask }: T
 			})
 		}
 	}
+    // <- Lógica para drag and drop das tasks
 	return (
 		<DndContext
 			sensors={sensors}

@@ -11,11 +11,11 @@ interface TaskCardProps {
 }
 
 export default function TaskCard({ task, deleteTask, updateTask, isOverlay }: TaskCardProps) {
+    // Lógica para drag and drop
 	const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: task.id })
 	const style = {
 		transition,
 		transform: CSS.Transform.toString(transform),
-		// Adiciona um efeito visual enquanto o item está sendo arrastado
 		opacity: isDragging ? 0 : 1,
 	}
 

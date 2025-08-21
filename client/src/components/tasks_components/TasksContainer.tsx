@@ -11,6 +11,7 @@ export interface Task {
 export default function TasksContainer() {
 	const [tasks, setTasks] = useState<Task[]>([])
 
+    // Carrega as tarefas armazenadas no localStorage ao iniciar o componente
 	useEffect(() => {
 		const storedTasks = localStorage.getItem('tasks')
 		if (storedTasks) {
@@ -18,6 +19,7 @@ export default function TasksContainer() {
 		}
 	}, [])
 
+    // Salva as tarefas no localStorage sempre que elas mudam
 	useEffect(() => {
 		localStorage.setItem('tasks', JSON.stringify(tasks))
 	}, [tasks])
