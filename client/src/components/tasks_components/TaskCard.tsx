@@ -1,29 +1,30 @@
-import { Check, TrashIcon } from 'lucide-react'
+import { Check, GripVertical, TrashIcon } from 'lucide-react'
 import type { Task } from './TasksContainer'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
-
 interface TaskCardProps {
 	task: Task
+    isOverlay?: boolean; 
 	deleteTask?: (id: string) => void
 	updateTask?: (id: string, updatedTask: Partial<Task>) => void
 }
 
-export default function TaskCard({ task, deleteTask, updateTask }: TaskCardProps) {
+export default function TaskCard({ task, deleteTask, updateTask, isOverlay }: TaskCardProps) {
 	const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: task.id })
 	const style = {
-        transition,
+		transition,
 		transform: CSS.Transform.toString(transform),
 		// Adiciona um efeito visual enquanto o item está sendo arrastado
 		opacity: isDragging ? 0 : 1,
 	}
+
 	return (
 		<div
-			className="bg-white max-w-full min-w-full min-h-[12%] max-h-[100%] grid grid-cols-[auto_1fr_auto] justify-between items-center gap-2 p-4 border-2 cursor-grab active:cursor-grabbing border-gray-200 rounded-2xl hover:shadow-md hover:scale-101 "
+			className="bg-white max-w-full min-w-full min-h-[12%] max-h-[100%] grid grid-cols-[auto_1fr_auto_auto] justify-between items-center gap-2 p-4 border-2 cursor-grab active:cursor-grabbing border-gray-200 rounded-2xl hover:shadow-md hover:scale-101 touch-none"
 			ref={setNodeRef}
-			{...attributes}
-			{...listeners}
+			{...(!isOverlay ? attributes : {})}
+			{...(!isOverlay ? listeners : {})}
 			style={style}
 		>
 			<Check
@@ -49,6 +50,7 @@ export default function TaskCard({ task, deleteTask, updateTask }: TaskCardProps
 				strokeWidth={4}
 				size={20}
 			/>
+			<GripVertical classname="border-0 focus:border-0 active:border-0" color="#4a5565" />
 		</div>
 	)
 }

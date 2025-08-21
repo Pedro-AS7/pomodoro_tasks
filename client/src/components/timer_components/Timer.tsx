@@ -119,7 +119,7 @@ export default function Timer() {
 			}
 			return prev
 		})
-        return () => {}
+		return () => {}
 	}, [timerConfig])
 
 	function getConfigState(): 1 | 2 | 3 | 4 {
@@ -182,142 +182,125 @@ export default function Timer() {
 	}
 
 	return (
-		<div className=" w-[50%] h-full flex flex-col justify-center items-center">
-			{isConfig ? (
-				<TimerConfig
-					lastValues={{
-						pomodoroDuration: timerConfig.time / 60,
-						shortBreakDuration: timerConfig.pauseDuration / 60,
-						longBreakDuration: timerConfig.longPauseDuration / 60,
-						pomodoroCycles: timerConfig.pomodoroCycles,
-						sessions: timerConfig.sessions,
-					}}
-					setConfig={(pomodoroDuration, shortBreakDuration, longBreakDuration, cyclesNumber, sessions) => {
-						setTimerConfig({
-							time: pomodoroDuration,
-							pauseDuration: shortBreakDuration,
-							longPauseDuration: longBreakDuration,
-							pomodoroCycles: cyclesNumber,
-							sessions: sessions,
-						})
-						console.log(
-							`Config set: ${pomodoroDuration}, ${shortBreakDuration}, ${longBreakDuration}, ${cyclesNumber}, ${sessions}`
-						)
-					}}
-					closeConfig={() => setIsConfig(false)}
-				/>
-			) : (
-				<div className="flex flex-col w-[50%] h-full bg justify-center items-center gap-x-2 gap-y-2">
-					<div className="h-[70%] w-full flex flex-col justify-center gap-y-5 items-center">
-						<div
-							className={`w-fit flex flex-col text-center justify-center items-center text-3xl font-bold ${
-								(timeState === 1 && time < timerConfig.time) || (timeState === 1 && isRunning)
-									? 'text-orange-500'
-									: timeState === 2
-									? 'text-green-500'
-									: timeState === 3
-									? 'text-blue-500'
-									: 'text-white'
-							}`}
-						>
-							{timeState === 1
-								? 'Focus'
-								: timeState === 2
-								? 'Short Break'
-								: timeState === 3
-								? 'Long Break'
-								: timeState === 4
-								? 'Finished'
-								: null}
-						</div>
-						<Clock
-							timer={
-								timeState === 1
-									? time
-									: timeState === 2
-									? pauseDuration
-									: timeState === 3
-									? longPauseDuration
-									: 0
-							}
-							setTimer={running}
-							isRunning={isRunning}
-						/>
-						<ProgressBar
-							progress={
-								100 -
-								(getTimerState[timeState] /
-									(timeState === 1
-										? timerConfig.time
-										: timeState === 2
-										? timerConfig.pauseDuration
-										: timerConfig.longPauseDuration)) *
-									100
-							}
-						/>
-					</div>
-					<div className="w-full items-center h-fit flex flex-col gap-3">
-						<StartStopButton
-							startStop={() =>
-								setIsRunning((prev) => {
-									if (pomodoroConfig?.length === 0) {
-										setConfig()
-									}
-									return !prev
-								})
-							}
-							value={isRunning ? 'STOP' : 'START'}
-						/>
-						<div className="flex gap-7 justify-center items-center ">
-							<Cog
-								className="cursor-pointer hover:scale-110 transition-all duration-200"
-								color="black"
-								size={24}
-								strokeWidth={3}
-								cursor="pointer"
-								onClick={() => setIsConfig(true)}
-							/>
-							<RotateCcw
-								className="cursor-pointer hover:scale-110 transition-all duration-200"
-								color="black"
-								strokeWidth={3}
-								size={24}
-								onClick={() => {
-									switch (timeState) {
-										case 1:
-											setTime(timerConfig.time)
-											console.log(`Resetting time to: ${timerConfig.time}`)
-											break
-										case 2:
-											setPauseDuration(timerConfig.pauseDuration)
-											break
-										case 3:
-											setLongPauseDuration(timerConfig.longPauseDuration)
-											break
-									}
-									setIsRunning(false)
-								}}
-							/>
-							<SkipForward
-								className="cursor-pointer hover:scale-110 transition-all duration-200"
-								color="black"
-								size={24}
-								strokeWidth={3}
-								cursor="pointer"
-								onClick={() => {
-									changeState()
-								}}
-							/>
-						</div>
-						<h1
-							onClick={setConfig}
-							className="w-[30%] flex gap-3 justify-center items-center bg-gray-100 cursor-pointer rounded-xl mt-2 shadow-sm text-gray-500 text-center text-lmd font-normal hover:scale-101 transition-all duration-200 active:scale-95"
-						>
-							Reset all
-						</h1>
-					</div>
+		<div className="flex flex-col w-full max-w-md h-auto bg-gray-50 rounded-xl shadow-md p-6 gap-6">
+			{/* Esta div centraliza o conteúdo do timer. O gap pode ser ajustado para telas menores. */}
+			<div className="w-full flex flex-col justify-center items-center gap-y-3 sm:gap-y-5">
+				{/* - Tipografia Responsiva: `text-2xl` em telas pequenas e `md:text-3xl` em telas médias ou maiores.
+      - A lógica de cores foi mantida, pois é excelente!
+    */}
+				<div
+					className={`w-fit flex flex-col text-center justify-center items-center font-bold text-2xl md:text-3xl ${
+						(timeState === 1 && time < timerConfig.time) || (timeState === 1 && isRunning)
+							? 'text-orange-500'
+							: timeState === 2
+							? 'text-green-500'
+							: timeState === 3
+							? 'text-blue-500'
+							: 'text-gray-800' // Cor padrão mais legível que 'text-white' em fundo claro
+					}`}
+				>
+					{/* Lógica de texto mantida */}
+					{timeState === 1
+						? 'Focus'
+						: timeState === 2
+						? 'Short Break'
+						: timeState === 3
+						? 'Long Break'
+						: timeState === 4
+						? 'Finished'
+						: 'Get Ready'}
 				</div>
-			)}
+
+				{/* Componentes Clock e ProgressBar mantidos, pois a lógica interna é que define seu visual */}
+				<Clock
+					timer={
+						timeState === 1
+							? time
+							: timeState === 2
+							? pauseDuration
+							: timeState === 3
+							? longPauseDuration
+							: 0
+					}
+					setTimer={running}
+					isRunning={isRunning}
+				/>
+				<ProgressBar
+					progress={
+						100 -
+						(getTimerState[timeState] /
+							(timeState === 1
+								? timerConfig.time
+								: timeState === 2
+								? timerConfig.pauseDuration
+								: timerConfig.longPauseDuration)) *
+							100
+					}
+				/>
+			</div>
+
+			{/* Container dos botões e controles */}
+			<div className="w-full items-center h-fit flex flex-col gap-4">
+				<StartStopButton
+					startStop={() =>
+						setIsRunning((prev) => {
+							if (pomodoroConfig?.length === 0) {
+								setConfig()
+							}
+							return !prev
+						})
+					}
+					value={isRunning ? 'STOP' : 'START'}
+				/>
+
+				{/* - Gap responsivo para os ícones: `gap-6` em telas pequenas e `sm:gap-8` em maiores. */}
+				<div className="flex gap-6 sm:gap-8 justify-center items-center">
+					<Cog
+						className="cursor-pointer hover:scale-110 transition-all duration-200"
+						color="black"
+						size={24}
+						strokeWidth={3}
+						onClick={() => setIsConfig(true)}
+					/>
+					<RotateCcw
+						className="cursor-pointer hover:scale-110 transition-all duration-200"
+						color="black"
+						strokeWidth={3}
+						size={24}
+						onClick={() => {
+							switch (timeState) {
+								case 1:
+									setTime(timerConfig.time)
+									break
+								case 2:
+									setPauseDuration(timerConfig.pauseDuration)
+									break
+								case 3:
+									setLongPauseDuration(timerConfig.longPauseDuration)
+									break
+							}
+							setIsRunning(false)
+						}}
+					/>
+					<SkipForward
+						className="cursor-pointer hover:scale-110 transition-all duration-200"
+						color="black"
+						size={24}
+						strokeWidth={3}
+						onClick={changeState}
+					/>
+				</div>
+
+				{/* - Botão "Reset all" com largura baseada no conteúdo (`w-auto`) e padding (`px-5 py-1`).
+      - Isso é muito mais estável do que `w-[30%]`.
+    */}
+				<button
+					onClick={setConfig}
+					className="w-auto px-5 py-1 flex gap-3 justify-center items-center bg-gray-200 cursor-pointer rounded-lg mt-2 shadow-sm text-gray-600 text-center font-medium hover:bg-gray-300 transition-all duration-200 active:scale-95"
+				>
+					Reset all
+				</button>
+			</div>
 		</div>
 	)
 }

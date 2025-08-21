@@ -36,9 +36,17 @@ export default function Clock({ timer, setTimer, isRunning }: ClockProps) {
 
 	return (
 		<div className="w-full h-fit flex flex-col justify-center items-center">
-			<h1 className="text-gray-500 text-[8.5rem] font-bold font-mono">
-				{TimeTraslate(timer).minutes}:{TimeTraslate(timer).seconds}
-			</h1>
-		</div>
+  {/*
+    - O tamanho da fonte agora é responsivo, começando com um valor menor para celulares
+      e aumentando progressivamente em telas maiores.
+    - `text-7xl`: Tamanho base para telas pequenas (mobile).
+    - `md:text-8xl`: Tamanho para telas médias (tablets).
+    - `lg:text-[8.5rem]`: O tamanho original, aplicado apenas em telas grandes (desktops).
+    - `whitespace-nowrap`: Impede que o timer quebre em duas linhas (ex: "10:" em uma linha e "30" na outra).
+  */}
+  <h1 className="text-gray-500 font-bold font-mono text-7xl md:text-8xl lg:text-[8.5rem] whitespace-nowrap">
+    {TimeTraslate(timer).minutes}:{TimeTraslate(timer).seconds}
+  </h1>
+</div>
 	)
 }

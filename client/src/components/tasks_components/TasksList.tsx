@@ -1,6 +1,14 @@
 import TaskCard from './TaskCard'
 import type { Task } from './TasksContainer'
-import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragOverlay } from '@dnd-kit/core'
+import {
+	DndContext,
+	closestCenter,
+	PointerSensor, // Sensor para mouse
+	TouchSensor,
+	useSensor,
+	useSensors,
+	DragOverlay,
+} from '@dnd-kit/core'
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core'
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useState } from 'react'
@@ -15,8 +23,16 @@ export default function TasksList({ tasks, setTasks, deleteTask, updateTask }: T
 	const [activeTask, setActiveTask] = useState<Task | null>(null)
 	const sensors = useSensors(
 		useSensor(PointerSensor, {
+			// Requer que o mouse se mova 8px para ativar
 			activationConstraint: {
-				distance: 8, // O usuário precisa arrastar por 8px para ativar o modo de arrastar
+				distance: 8,
+			},
+		}),
+		useSensor(TouchSensor, {
+			// Requer um toque de 250ms e tolerância de 5px de movimento
+			activationConstraint: {
+				delay: 250,
+				tolerance: 5,
 			},
 		})
 	)
@@ -52,7 +68,7 @@ export default function TasksList({ tasks, setTasks, deleteTask, updateTask }: T
 						<TaskCard key={index} task={task} deleteTask={deleteTask} updateTask={updateTask} />
 					))}
 				</div>
-				<DragOverlay>{activeTask ? <TaskCard task={activeTask} /> : null}</DragOverlay>
+				<DragOverlay>{activeTask ? <TaskCard task={activeTask} isOverlay={true} /> : null}</DragOverlay>
 			</SortableContext>
 		</DndContext>
 	)

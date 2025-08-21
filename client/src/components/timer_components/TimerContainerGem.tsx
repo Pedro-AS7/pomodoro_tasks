@@ -167,7 +167,7 @@ export default function Timer() {
 	}, [currentState, timeForCurrentState, totalDurationForState])
 
 	return (
-		<div className="w-[50%] h-full flex flex-col justify-center items-center">
+		<div className="w-full h-full lg:w-[100%] max-w-xl rounded-xl  p-6 sm:p-8">
 			{isConfigOpen ? (
 				<TimerConfig
 					lastValues={{
@@ -178,77 +178,93 @@ export default function Timer() {
 						sessions: timerConfig.sessions,
 					}}
 					setConfig={(pomodoroDuration, shortBreakDuration, longBreakDuration, cyclesNumber, sessions) => {
-						setTimerConfig({
-							time: pomodoroDuration,
-							pauseDuration: shortBreakDuration,
-							longPauseDuration: longBreakDuration,
-							pomodoroCycles: cyclesNumber,
-							sessions: sessions,
+						setTimerConfig(() => {
+							console.log(
+								`Setting new config: ${pomodoroDuration}, ${shortBreakDuration}, ${longBreakDuration}, ${cyclesNumber}, ${sessions}`
+							)
+							return {
+								time: pomodoroDuration,
+								pauseDuration: shortBreakDuration,
+								longPauseDuration: longBreakDuration,
+								pomodoroCycles: cyclesNumber,
+								sessions: sessions,
+							}
 						})
 					}}
 					closeConfig={() => setIsConfigOpen(false)}
 				/>
-			) : (
-				<div className="flex flex-col w-[50%] h-full justify-center items-center gap-x-2 gap-y-2">
-					<div className="h-[70%] w-full flex flex-col justify-center gap-y-5 items-center">
-						<div
-							className={`w-fit flex flex-col text-center justify-center items-center text-3xl font-bold ${
-								stateInfo[currentState]?.color || 'text-white'
-							}`}
-						>
-							{stateInfo[currentState]?.text}
-						</div>
-
-						<Clock timer={timeForCurrentState[currentState]} setTimer={handleTick} isRunning={isRunning} />
-
-						<ProgressBar progress={progress} />
-					</div>
-
-					<div className="w-full items-center h-fit flex flex-col gap-3">
-						<StartStopButton
-							startStop={() => {
-								if (currentState === TIMER_STATES.FINISHED) {
-									resetTimer()
-									setIsRunning(true)
-								} else {
-									setIsRunning((prev) => !prev)
-								}
-							}}
-							value={isRunning ? 'STOP' : 'START'}
-						/>
-
-						<div className="flex gap-7 justify-center items-center ">
-							<Cog
-								className="cursor-pointer hover:scale-110 transition-all duration-200"
-								color="gray"
-								size={24}
-								strokeWidth={3}
-								onClick={() => setIsConfigOpen(true)}
-							/>
-							<RotateCcw
-								className="cursor-pointer hover:scale-110 transition-all duration-200"
-								color="gray"
-								strokeWidth={3}
-								size={24}
-								onClick={resetState}
-							/>
-							<SkipForward
-								className="cursor-pointer hover:scale-110 transition-all duration-200"
-								color="gray"
-								size={24}
-								strokeWidth={3}
-								onClick={advanceToNextState}
-							/>
-						</div>
-					</div>
-					<h1
-						onClick={resetTimer}
-						className="w-[30%] flex gap-3 justify-center items-center bg-gray-100 cursor-pointer rounded-xl mt-2 shadow-sm text-gray-500 text-center text-lmd font-normal hover:scale-101 transition-all duration-200 active:scale-95"
+			) : null}
+			<div className="flex flex-col w-full h-full justify-center items-center gap-8">
+				{/* Seção do display do timer */}
+				<div className="w-full flex flex-col justify-center items-center gap-y-4">
+					{/*
+          - Tipografia responsiva: `text-2xl` em telas pequenas e `sm:text-3xl` em telas maiores.
+        */}
+					<div
+						className={`w-fit text-center font-bold text-2xl sm:text-3xl ${
+							stateInfo[currentState]?.color || 'text-gray-800'
+						}`}
 					>
-						Reset all
-					</h1>
+						{stateInfo[currentState]?.text}
+					</div>
+
+					<Clock timer={timeForCurrentState[currentState]} setTimer={handleTick} isRunning={isRunning} />
+
+					<ProgressBar progress={progress} />
 				</div>
-			)}
+
+				{/* Seção dos controles */}
+				<div className="w-full items-center flex flex-col gap-4">
+					<StartStopButton
+						startStop={() => {
+							if (currentState === TIMER_STATES.FINISHED) {
+								resetTimer()
+								setIsRunning(true)
+							} else {
+								setIsRunning((prev) => !prev)
+							}
+						}}
+						value={isRunning ? 'STOP' : 'START'}
+					/>
+
+					{/* - Espaçamento dos ícones responsivo: `gap-6` em mobile e `sm:gap-8` em telas maiores. */}
+					<div className="flex gap-6 sm:gap-8 justify-center items-center">
+						<Cog
+							className="cursor-pointer lg:hover:scale-110 transition-all duration-200"
+							color="gray"
+							size={24}
+							strokeWidth={3}
+							onClick={() => {setIsConfigOpen(true); setIsRunning(false)}}
+						/>
+						<RotateCcw
+							className="cursor-pointer hover:scale-110 transition-all duration-200"
+							color="gray"
+							strokeWidth={3}
+							size={24}
+							onClick={resetState}
+						/>
+						<SkipForward
+							className="cursor-pointer hover:scale-110 transition-all duration-200"
+							color="gray"
+							size={24}
+							strokeWidth={3}
+							onClick={advanceToNextState}
+						/>
+					</div>
+				</div>
+
+				{/*
+        - Botão "Reset all" agora é um elemento <button> para melhor semântica.
+        - `w-auto` faz a largura se ajustar ao conteúdo, e `px-5 py-1` adiciona um padding confortável.
+        - Isso é muito mais robusto do que `w-[30%]`.
+      */}
+				<button
+					onClick={resetTimer}
+					className="w-auto px-5 py-1 flex justify-center items-center bg-gray-100 cursor-pointer rounded-lg shadow-sm text-gray-600 text-center font-medium hover:bg-gray-200 transition-all duration-200 active:scale-95"
+				>
+					Reset all
+				</button>
+			</div>
 		</div>
 	)
 }

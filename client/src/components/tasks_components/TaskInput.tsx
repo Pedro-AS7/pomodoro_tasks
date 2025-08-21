@@ -24,17 +24,18 @@ export default function TaskInput({ addTask }: TaskInputProps) {
 					}
 				}}
 				type="text"
+
 				placeholder="Add a new task"
-				className="w-full p-4 text-lg border-white bg-[#8b8b8b91] placeholder-white 
-                     text-white rounded-2xl "
+				className="w-full p-4 text-lg border-white bg-[#8b8b8b2f] placeholder-black 
+                     text-black rounded-2xl ring-0 ring-transparent focus:ring-[#8b8b8b00]"
 			/>
 			<button
-				onClick={() => {
+				onClick={(e) => {
 					if (!task.trim()) return // Prevent adding empty tasks
 					addTask({ id: uuidv4(), content: task, isCompleted: false })
 					setTask('')
 				}}
-				className="px-4 bg-[#8b8b8b91] text-lg text-white font-bold rounded-2xl hover:bg-[#8b8b8b7c] active:scale-97"
+				className="px-4 bg-[#8b8b8b2f] text-lg text-black font-bold rounded-2xl hover:bg-[#8b8b8b54] active:scale-97"
 			>
 				Add
 			</button>

@@ -23,10 +23,9 @@ export default function TasksContainer() {
 	}, [tasks])
 
 	return (
-		<div className="bg-[#a5a5a53a] border-4 border-gray-300 w-[40%] h-full  flex flex-col gap-5 p-3 rounded-3xl ">
+		<div className="bg-[#a5a5a515] border-4 border-gray-50 w-full max-w-xl lg:max-w-none lg:w-[100%] h-[100%] flex flex-col gap-5 p-4 sm:p-6 rounded-3xl">
 			<TaskInput addTask={(task) => setTasks((prev) => [...prev, task])} />
 			<TasksList
-            
 				tasks={tasks}
 				setTasks={setTasks}
 				deleteTask={(id) => {
