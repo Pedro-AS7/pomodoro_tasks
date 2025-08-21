@@ -50,7 +50,7 @@ export default function TaskCard({ task, deleteTask, updateTask, isOverlay }: Ta
 				strokeWidth={4}
 				size={20}
 			/>
-			<GripVertical classname="border-0 focus:border-0 active:border-0" color="#4a5565" />
+			<GripVertical className="border-0 focus:border-0 active:border-0" color="#4a5565" />
 		</div>
 	)
 }
