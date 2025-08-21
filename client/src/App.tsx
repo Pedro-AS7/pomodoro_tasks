@@ -5,7 +5,7 @@ function App() {
 	return (
 		<main className="bg-[#ffffff] w-full h-screen flex flex-col items-center gap-6 lg:gap-10 border-t-4 border-orange-500 p-4 sm:p-6 lg:p-6">
 			<nav className="w-full flex items-center">
-                <img src="../public/favicon.png" alt="" width={50}/>
+                <img src="/favicon.png" width={50}/>
 				<h1 className="text-gray-700 text-xl sm:text-2xl font-bold">Pomodoro Tasks</h1>
 			</nav>
 
