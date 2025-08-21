@@ -1,6 +1,8 @@
-import { Check, CircleCheck, TrashIcon } from 'lucide-react'
+import { Check, TrashIcon } from 'lucide-react'
 import type { Task } from './TasksContainer'
-import { useState } from 'react'
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+
 
 interface TaskCardProps {
 	task: Task
@@ -9,8 +11,21 @@ interface TaskCardProps {
 }
 
 export default function TaskCard({ task, deleteTask, updateTask }: TaskCardProps) {
+	const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: task.id })
+	const style = {
+        transition,
+		transform: CSS.Transform.toString(transform),
+		// Adiciona um efeito visual enquanto o item está sendo arrastado
+		opacity: isDragging ? 0 : 1,
+	}
 	return (
-		<div className="bg-white w-full h-[12%] flex justify-between items-center gap-2 p-4 border border-gray-300 rounded-xl hover:shadow-2xl">
+		<div
+			className="bg-white max-w-full min-w-full min-h-[12%] max-h-[100%] grid grid-cols-[auto_1fr_auto] justify-between items-center gap-2 p-4 border-2 cursor-grab active:cursor-grabbing border-gray-200 rounded-2xl hover:shadow-md hover:scale-101 "
+			ref={setNodeRef}
+			{...attributes}
+			{...listeners}
+			style={style}
+		>
 			<Check
 				className={`cursor-pointer ${
 					task.isCompleted ? 'text-green-500' : 'text-gray-300 hover:text-green-500'
@@ -19,11 +34,21 @@ export default function TaskCard({ task, deleteTask, updateTask }: TaskCardProps
 				size={22}
 				strokeWidth={4}
 			/>
-			<h2 className={`w-[100%] text-gray-600 text-[1.1rem] font-bold ${task.isCompleted ? 'line-through' : ''}`}>
+			<h2
+				className={`min-w-full flex text-gray-600 text-[1.1rem] break-words font-bold ${
+					task.isCompleted ? 'line-through' : ''
+				}`}
+			>
 				{task.content}
 			</h2>
 
-			<TrashIcon className="cursor-pointer hover:scale-110" onClick={() => deleteTask?.(task.id)} color="#fa2c36" strokeWidth={4} size={20} />
+			<TrashIcon
+				className="cursor-pointer hover:scale-110 transition-shadow 300"
+				onClick={() => deleteTask?.(task.id)}
+				color="#fa2c36"
+				strokeWidth={4}
+				size={20}
+			/>
 		</div>
 	)
 }

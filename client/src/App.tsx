@@ -1,20 +1,17 @@
-import Timer from './components/timer_components/TimerContainer'
 import TasksContainer from './components/tasks_components/TasksContainer'
+import TimerContainerGem from './components/timer_components/TimerContainerGem'
 
 
 function App() {
 
 	return (
-        <main className='bg-[#272727] w-screen h-screen flex flex-col items-center gap-10 border-t-3 border-orange-500'>
-            <nav className="w-full flex justify-between items-center px-6 py-4 bg-[#272727]">
-            <h1 className="text-white text-2xl font-bold">Pomodoro Tasks</h1>
-            <button className="px-4 py-2 bg-white text-black font-semibold rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
-                Login
-            </button>
+        <main className='bg-[#ffffff] w-screen h-screen flex flex-col items-center gap-10 border-t-4 border-orange-500'>
+            <nav className="w-full flex justify-between items-center px-6 py-4 bg-white">
+            <h1 className="text-gray-700 text-2xl font-bold">Pomodoro Tasks</h1>
             </nav>
 
             <section className='w-full h-[80%] flex flex-col lg:flex-row justify-center items-center gap-10'>
-                <Timer />
+                <TimerContainerGem />
                 <TasksContainer />
             </section>
         </main>

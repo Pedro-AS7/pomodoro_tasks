@@ -10,7 +10,7 @@ export default function TaskInput({ addTask }: TaskInputProps) {
 	const [task, setTask] = useState<string>('')
 
 	return (
-		<div className="w-full flex gap-3">
+		<div className="w-full flex gap-1">
 			<input
 				value={task}
 				onChange={(e) => {
@@ -25,8 +25,8 @@ export default function TaskInput({ addTask }: TaskInputProps) {
 				}}
 				type="text"
 				placeholder="Add a new task"
-				className="w-full p-4 text-lg bg-[#ffffff48] placeholder-gray-50 
-                     text-gray-50 rounded-xl "
+				className="w-full p-4 text-lg border-white bg-[#8b8b8b91] placeholder-white 
+                     text-white rounded-2xl "
 			/>
 			<button
 				onClick={() => {
@@ -34,7 +34,7 @@ export default function TaskInput({ addTask }: TaskInputProps) {
 					addTask({ id: uuidv4(), content: task, isCompleted: false })
 					setTask('')
 				}}
-				className="px-4 bg-white text-lg text-black font-bold rounded-xl hover:bg-gray-100 active:scale-97"
+				className="px-4 bg-[#8b8b8b91] text-lg text-white font-bold rounded-2xl hover:bg-[#8b8b8b7c] active:scale-97"
 			>
 				Add
 			</button>

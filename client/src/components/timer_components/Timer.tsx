@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 import Clock from './Clock'
 import ProgressBar from './ProgressBar'
-import ResetButton from './ResetButton'
 import StartStopButton from './StartStopButton'
-import { Cog, SkipForward } from 'lucide-react'
+import { Cog, RotateCcw, SkipForward } from 'lucide-react'
 import TimerConfig from './TimerConfig'
 
 export default function Timer() {
@@ -120,6 +119,7 @@ export default function Timer() {
 			}
 			return prev
 		})
+        return () => {}
 	}, [timerConfig])
 
 	function getConfigState(): 1 | 2 | 3 | 4 {
@@ -131,14 +131,11 @@ export default function Timer() {
 	function changeState() {
 		if (pomodoroConfig?.length === 0 && timeState !== 4) {
 			console.log('No more states to change to, resetting timer.')
-			setTimeState((p) => {
-				console.log(`Resetting state: ${p}`)
-				return 4
-			})
+			setTimeState(4)
 			setIsRunning(false)
 			setTime(0)
 			console.log('state: ' + timeState)
-		} else {
+		} else if (timeState !== 4) {
 			switch (timeState) {
 				case 1:
 					setTime(timerConfig.time)
@@ -210,15 +207,17 @@ export default function Timer() {
 					closeConfig={() => setIsConfig(false)}
 				/>
 			) : (
-				<div className="flex flex-col w-[50%] h-full bg justify-between items-center gap-x-2 gap-y-10">
-					<div className="h-[70%] w-full flex flex-col items-center gap-3">
+				<div className="flex flex-col w-[50%] h-full bg justify-center items-center gap-x-2 gap-y-2">
+					<div className="h-[70%] w-full flex flex-col justify-center gap-y-5 items-center">
 						<div
-							className={`w-fit flex flex-col text-center justify-center items-center gap-1 text-3xl font-bold ${
-								timeState === 1
+							className={`w-fit flex flex-col text-center justify-center items-center text-3xl font-bold ${
+								(timeState === 1 && time < timerConfig.time) || (timeState === 1 && isRunning)
 									? 'text-orange-500'
 									: timeState === 2
 									? 'text-green-500'
-									: 'text-blue-500'
+									: timeState === 3
+									? 'text-blue-500'
+									: 'text-white'
 							}`}
 						>
 							{timeState === 1
@@ -230,10 +229,6 @@ export default function Timer() {
 								: timeState === 4
 								? 'Finished'
 								: null}
-							<div className="flex gap-3 ">
-								<h1 className="text-gray-300 text-center text-lg font-normal">Reset all</h1>
-								<ResetButton size={16} reset={() => setConfig()} />
-							</div>
 						</div>
 						<Clock
 							timer={
@@ -261,22 +256,33 @@ export default function Timer() {
 							}
 						/>
 					</div>
-					<div className='w-full h-[25%] flex flex-col gap-3'>
+					<div className="w-full items-center h-fit flex flex-col gap-3">
 						<StartStopButton
-							startStop={() => setIsRunning((prev) => !prev)}
+							startStop={() =>
+								setIsRunning((prev) => {
+									if (pomodoroConfig?.length === 0) {
+										setConfig()
+									}
+									return !prev
+								})
+							}
 							value={isRunning ? 'STOP' : 'START'}
 						/>
-						<div className="flex gap-2 justify-center items-center ">
+						<div className="flex gap-7 justify-center items-center ">
 							<Cog
-								color="white"
+								className="cursor-pointer hover:scale-110 transition-all duration-200"
+								color="black"
 								size={24}
 								strokeWidth={3}
 								cursor="pointer"
 								onClick={() => setIsConfig(true)}
 							/>
-							<ResetButton
+							<RotateCcw
+								className="cursor-pointer hover:scale-110 transition-all duration-200"
+								color="black"
+								strokeWidth={3}
 								size={24}
-								reset={() => {
+								onClick={() => {
 									switch (timeState) {
 										case 1:
 											setTime(timerConfig.time)
@@ -293,7 +299,8 @@ export default function Timer() {
 								}}
 							/>
 							<SkipForward
-								color="white"
+								className="cursor-pointer hover:scale-110 transition-all duration-200"
+								color="black"
 								size={24}
 								strokeWidth={3}
 								cursor="pointer"
@@ -302,6 +309,12 @@ export default function Timer() {
 								}}
 							/>
 						</div>
+						<h1
+							onClick={setConfig}
+							className="w-[30%] flex gap-3 justify-center items-center bg-gray-100 cursor-pointer rounded-xl mt-2 shadow-sm text-gray-500 text-center text-lmd font-normal hover:scale-101 transition-all duration-200 active:scale-95"
+						>
+							Reset all
+						</h1>
 					</div>
 				</div>
 			)}

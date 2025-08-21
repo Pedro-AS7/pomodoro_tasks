@@ -1,5 +1,4 @@
-import { Cog } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
 interface ClockProps {
 	timer: number
@@ -36,8 +35,8 @@ export default function Clock({ timer, setTimer, isRunning }: ClockProps) {
 	}, [isRunning, timer, setTimer])
 
 	return (
-		<div className="w-full h-full flex flex-col justify-center items-center">
-			<h1 className="text-white text-[8.5rem] font-bold font-mono">
+		<div className="w-full h-fit flex flex-col justify-center items-center">
+			<h1 className="text-gray-500 text-[8.5rem] font-bold font-mono">
 				{TimeTraslate(timer).minutes}:{TimeTraslate(timer).seconds}
 			</h1>
 		</div>
