@@ -20,7 +20,7 @@ const CheckCircleIcon = () => (
 
 const PomodoroInfo = () => {
 	return (
-		<section className="bg-[#a5a5a515] shadow-md rounded-4xl max-w-4xl mx-auto p-6 sm:p-10 my-8 font-sans">
+		<section className="bg-[#a5a5a515] h-fit w-fit shadow-md rounded-4xl max-w-4xl mx-auto p-6 sm:p-10 my-8 font-semibold text-xl">
 			<div className="text-center mb-8">
 				<h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">
 					Master Your Time with the Pomodoro Technique
