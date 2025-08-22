@@ -1,5 +1,4 @@
-import { BadgeCheck } from 'lucide-react'
-import React from 'react'
+
 
 // A simple Icon component for list items, you can replace this with a library like react-icons
 const CheckCircleIcon = () => (
