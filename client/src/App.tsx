@@ -1,5 +1,6 @@
 import TasksContainer from './components/tasks_components/TasksContainer'
 import TimerContainerGem from './components/timer_components/Timer'
+import PomodoroInfo from './components/PomodoroInfo'
 
 function App() {
 	return (
@@ -17,6 +18,9 @@ function App() {
 					<TasksContainer />
 				</div>
 			</section>
+            <section>
+                <PomodoroInfo />
+            </section>
 		</main>
 	)
 }
